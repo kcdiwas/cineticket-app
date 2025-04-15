@@ -2,6 +2,11 @@
 
 require_once "./includes/header.php";
 
+if (isLoggedIn()) {
+    header('Location: /index.php');
+    exit();
+}
+
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     // Get Form Data 
     $username = trim($_POST['username']);
@@ -25,6 +30,34 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $errorMessage = "Passwords do not match";
     } else {
         // Perform Registration Work
+        $check_sql = "SELECT id from users WHERE username = ? OR email = ?";
+        $check_stmt = mysqli_prepare($conn, $check_sql);
+
+        if ($check_stmt) {
+            mysqli_stmt_bind_param($check_stmt, "ss", $username, $email);
+            mysqli_stmt_execute($check_stmt);
+            mysqli_stmt_store_result($check_stmt);
+
+            if (mysqli_stmt_num_rows($check_stmt) > 0) {
+                $errorMessage = "Username or email already exists";
+            } else {
+                // Now Insert users into database
+                $password = password_hash($password, PASSWORD_DEFAULT);
+                $insert_sql = "INSERT INTO users(username, email, full_name, password) VALUES(?, ?, ?, ?);";
+                $insert_stmt = mysqli_prepare($conn, $insert_sql);
+
+                if ($insert_stmt) {
+                    mysqli_stmt_bind_param($insert_stmt, "ssss", $username, $email, $full_name, $password);
+                    if (mysqli_stmt_execute($insert_stmt)) {
+                        // Redirect to login page
+                        header('Location: /login.php');
+                        exit();
+                    } else {
+                        $errorMessage = "Registration Failed.";
+                    }
+                }
+            }
+        }
     }
 }
 

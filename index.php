@@ -1,4 +1,5 @@
 <?php 
+require_once "./includes/header.php";
 
 $movies = [
     [
@@ -32,12 +33,6 @@ $movies = [
 
 
 ?>
-
-    <!-- include, include_once, require, require_once -->
-   <?php 
-        require_once "./includes/header.php" 
-   ?>
-
 
     <!-- Hero Section --> 
      <section class="hero">
