@@ -443,6 +443,21 @@ footer {
     justify-content: center;
 }
 
-.seat.reserved {
+.seat.selected {
     background-color: #f6f200;
+}
+
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: var(--primary);
+    color: var(--light);
+    font-weight: 600;
+}
+
+.btn:hover {
+    cursor: pointer;
+    background-color: rgb(101, 1, 1);
 }

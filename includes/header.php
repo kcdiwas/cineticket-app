@@ -5,6 +5,14 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+function dd($value)
+{
+    echo "<pre>";
+    print_r($value);
+    echo "</pre>";
+    die();
+}
+
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }

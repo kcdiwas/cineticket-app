@@ -1,33 +1,50 @@
 <?php 
 
 require_once "./includes/header.php";
+
+$movie_id = isset($_GET['movieId']) ? $_GET['movieId'] : 1;
+
+$query = "SELECT * FROM movies where id = $movie_id";
+$result = mysqli_query($conn, $query);
+
+$movie = mysqli_fetch_assoc($result);
+
+// Fetch show time
+$show_query = "SELECT * FROM show_times WHERE movie_id = $movie_id";
+$show_result = mysqli_query($conn, $show_query);
+$show_times = mysqli_fetch_all($show_result, MYSQLI_ASSOC);
 ?>
 
 <section id="booking-section">
     <div class="container">
         <div class="booking-container">
             <div class="booking-poster">
-                <img src="https://d346azgjfhsciq.cloudfront.net/S3/uploads/gallery/1742298334059-basanta.jpg" alt="">
+                <img src="<?= $movie['poster_url'] ?>" alt="">
             </div>
             <div class="booking-details">
-                <h2 class="booking-title">Movie Title</h2>
+                <h2 class="booking-title"><?= $movie['title'] ?></h2>
                 <div class="booking-info">
                     <p>
-                        <strong>Genre:</strong> Drama
+                        <strong>Genre:</strong> <?= $movie['genre'] ?>
                     </p>
                     <p>
-                        <strong>Duration:</strong> 2h30m
+                        <strong>Duration:</strong> <?= $movie['duration'] ?>
                     </p>
                     <p>
-                        <strong>Rs. 400</strong> per ticket
+                        <strong>Rs. <?= $movie['price'] ?></strong> per ticket
                     </p>
                 </div>
 
-                <form action="" id="booking-form">
+                <form action="/process_booking.php" method="POST" id="booking-form">
+                    <input type="hidden" name="movie_id" value="<?= $movie_id ?>">
+                    <input type="hidden" name="selected_seats" id="selected-seats" value="">
+                    <input type="hidden" name="total_price" id="total-price" value="0">
                     <div class="form-group">
                         <label for="">Select Date</label>
-                        <select name="" id="">
-                            <option value="">9:00 AM</option>
+                        <select name="show_id" id="">
+                            <?php foreach($show_times as $showTime): ?>
+                            <option value="<?= $showTime['id'] ?>"><?= date('F d, Y - h:i:A',strtotime($showTime['datetime'])) ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
 
@@ -37,12 +54,18 @@ require_once "./includes/header.php";
                         <div id="seats-container" class="seats-container">
                         </div>
                     </div>
+
+                    <button type="submit" class="btn"> Confirm Booking</button>
                 </form>
             </div>
         </div>
     </div>
 </section>
 
+
+<script>
+ const movieTicketPrice = <?php echo $movie['price']; ?>;
+</script>
 
 <script src="./assets/js/booking.js"></script>
 <?php 
